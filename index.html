@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connecting to Form...</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
+        .loader { text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <p>กำลังเตรียมข้อมูลของคุณ...</p>
+    </div>
+
+    <script>
+        async function main() {
+            // 1. ใส่ LIFF ID ที่คุณได้จาก LINE Developers
+            await liff.init({ liffId: "ใส่_LIFF_ID_ของคุณที่นี่" });
+
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            } else {
+                const profile = await liff.getProfile();
+                const userId = profile.userId;
+
+                // 2. URL ของ Google Form (ใช้ตัวที่คุณส่งมา)
+                const baseFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeJvVqppQK2ERxqxrxU3QLK5tT5N432L91qxtVnUsQfn9o_cQ/viewform";
+                
+                // 3. เลข Entry ID ที่เราหามาได้
+                const entryId = "entry.1773951231"; 
+
+                // สร้างลิงก์ที่มี UID ติดไปด้วย
+                const finalUrl = `${baseFormUrl}?usp=pp_url&${entryId}=${userId}`;
+
+                // ส่งผู้ใช้ไปยัง Google Form ทันที
+                window.location.href = finalUrl;
+            }
+        }
+        main();
+    </script>
+</body>
+</html>
