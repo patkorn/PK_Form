@@ -16,7 +16,7 @@
             background-color: #f4f4f9; 
         }
         
-        /* หน้าจอโหลดข้อมูล */
+        /* ฉากหน้าจอโหลดข้อมูล */
         .loader { text-align: center; }
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
@@ -54,14 +54,30 @@
             0% { transform: scale(0.8); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        .modal-icon {
-            font-size: 50px;
-            margin-bottom: 10px;
+        
+        /* ส่วนของไอคอนด้านบน */
+        .modal-icon-container {
+            width: 70px;
+            height: 70px;
+            border-radius: 22px; /* โค้งมนแบบไอคอนแอป */
+            background-color: #06C755; /* สีเขียว LINE */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 15px auto;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
+        .modal-icon-line {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* ทำให้โลโก้เต็มพื้นที่ */
+        }
+        
         .modal-title { margin: 0 0 10px 0; color: #111; font-size: 22px; font-weight: bold; }
         .modal-text { margin: 0 0 15px 0; color: #666; font-size: 15px; }
         
-        /* กล่องแสดงรหัส UID */
+        /* กล่องแสดงรหัส UID (พรางตัว) */
         .uid-box {
             background: #f0f4f8;
             padding: 12px;
@@ -93,14 +109,17 @@
 <body>
     <div class="loader" id="loaderSection">
         <div class="spinner"></div>
-        <p id="statusText">กำลังตรวจสอบข้อมูล LINE...</p>
+        <p id="statusText">กรุณารอสักครู่...</p>
     </div>
 
     <div id="customModal" class="modal-overlay" style="display: none;">
         <div class="modal-box">
-            <div class="modal-icon">✅</div>
+            <div class="modal-icon-container">
+                <img src="https://cdn.jsdelivr.net/gh/patkorn/piclogo/PK_EA.png" alt="LINE" class="modal-icon-line">
+            </div>
+            
             <h3 class="modal-title">ยืนยันตัวตนสำเร็จ!</h3>
-            <p class="modal-text">ระบบได้เชื่อมต่อบัญชี LINE ของคุณเรียบร้อยแล้ว รหัสของคุณคือ:</p>
+            <p class="modal-text">ยินดีต้อนรับสู่PK_EA Trader รหัสของคุณคือ:</p>
             <div class="uid-box" id="uidDisplay"></div>
             <button class="btn-primary" onclick="goToForm()">เข้าสู่หน้ากรอกข้อมูล</button>
         </div>
@@ -108,6 +127,13 @@
 
     <script>
         let finalFormUrl = ""; // ตัวแปรเก็บลิงก์ที่จะไป
+
+        // --- เพิ่มฟังก์ชันพราง UID ---
+        function maskUid(uid) {
+            if (uid.length <= 14) return uid;
+            // โชว์ 10 ตัวแรก และ 4 ตัวสุดท้าย ตรงกลางพรางด้วย ****
+            return uid.substring(0, 5) + "****" + uid.substring(uid.length - 5);
+        }
 
         async function main() {
             try {
@@ -123,9 +149,12 @@
                     const entryId = "entry.1773951231"; 
                     finalFormUrl = `${baseFormUrl}?usp=pp_url&${entryId}=${userId}`;
 
+                    // พรางรหัส UID ก่อนแสดงผล
+                    const maskedUid = maskUid(userId);
+
                     // เมื่อดึงข้อมูลเสร็จ ให้ซ่อนหน้าโหลด และโชว์ ป๊อปอัพสวยๆ แทน
                     document.getElementById('loaderSection').style.display = 'none';
-                    document.getElementById('uidDisplay').innerText = userId;
+                    document.getElementById('uidDisplay').innerText = maskedUid;
                     document.getElementById('customModal').style.display = 'flex';
                 }
             } catch (err) {
