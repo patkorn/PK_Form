@@ -6,44 +6,21 @@
     <title>เข้าสู่ระบบฟอร์ม...</title>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            background-color: #f4f4f9; 
-        }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; }
         .loader { text-align: center; }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #06C755; /* สีเขียว LINE */
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px auto;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .error-msg { color: #d9534f; margin-top: 10px; display: none; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="loader">
-        <div class="spinner" id="spinner"></div>
         <p id="statusText">กรุณารอสักครู่...</p>
-        <p id="errorText" class="error-msg"></p>
     </div>
 
     <script>
         async function main() {
             try {
-                // 1. ใส่ LIFF ID
                 await liff.init({ liffId: "2009651859-yFydAvlN" });
 
                 if (!liff.isLoggedIn()) {
-                    // หากยังไม่ได้ล็อกอิน ให้บังคับล็อกอินและเด้งกลับมาหน้าเดิม
                     liff.login({ redirectUri: window.location.href });
                 } else {
                     document.getElementById('statusText').innerText = "กำลังเตรียมแบบฟอร์ม...";
@@ -51,31 +28,19 @@
                     const profile = await liff.getProfile();
                     const userId = profile.userId;
 
-                    // 2. URL ของ Google Form (ตรวจให้แน่ใจว่าเป็นลิงก์ publish ไม่ใช่ edit)
-                    const baseFormUrl = "https://forms.gle/DkHBEarNfWFm4Uma9";
-                    
-                    // 3. เลข Entry ID ของคำถาม LINE_UID_HIDDEN
+                    const baseFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeJvVqppQK2ERxqxrxU3QLK5tT5N432L91qxtVnUsQfn9o_cQ/viewform";
                     const entryId = "entry.1773951231"; 
-
-                    // 4. สร้างลิงก์ Pre-filled
                     const finalUrl = `${baseFormUrl}?usp=pp_url&${entryId}=${userId}`;
 
-                    console.log("UID: ", userId);
-                    console.log("Redirecting to: ", finalUrl);
+                    // --- เพิ่มระบบ Debug เด้งแจ้งเตือนเพื่อดูรหัส UID ---
+                    alert("ตรวจสอบสถานะ:\nดึง UID สำเร็จ!\nรหัสของคุณคือ: " + userId + "\n\nกด OK เพื่อไปหน้ากรอกฟอร์ม");
 
-                    // 5. ส่งไปยัง Google Form (ใช้ replace เพื่อป้องกันไม่ให้ผู้ใช้กด Back กลับมาหน้าโหลดซ้ำ)
                     window.location.replace(finalUrl);
                 }
             } catch (err) {
-                // จัดการ Error กรณีเปิดในเบราว์เซอร์ที่ไม่รองรับ หรือตั้งค่า LIFF ผิด
-                console.error("LIFF Initialization failed", err);
-                document.getElementById('spinner').style.display = 'none';
-                document.getElementById('statusText').innerText = "เชื่อมต่อล้มเหลว";
-                document.getElementById('errorText').innerText = "Error: " + err.message;
-                document.getElementById('errorText').style.display = 'block';
+                alert("เกิดข้อผิดพลาด: " + err.message);
             }
         }
-        
         main();
     </script>
 </body>
